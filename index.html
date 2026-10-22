@@ -24,6 +24,14 @@ header p{margin:0;opacity:.9}
 .tab{border:1px solid var(--line);background:#fff;padding:10px 15px;border-radius:9px;cursor:pointer;font-weight:700}
 .tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:15px}
+details.collapsible-panel{padding:0;overflow:hidden}
+details.collapsible-panel>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px;user-select:none}
+details.collapsible-panel>summary::-webkit-details-marker{display:none}
+details.collapsible-panel>summary::after{content:"▾";font-size:16px;color:var(--muted);margin-left:auto;transition:transform .15s}
+details.collapsible-panel:not([open])>summary::after{content:"▸"}
+details.collapsible-panel>summary .section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:1}
+details.collapsible-panel>summary h2{margin:0}
+.collapsible-content{padding:0 16px 16px}
 .filters{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:8px}
 .filter{grid-column:span 2;min-width:0;border:1px solid var(--line);border-radius:9px;padding:6px;background:#fafbfc}.filter.narrow{grid-column:span 1}.filter.wide{grid-column:span 3}
 .filter label{display:block;font-size:11px;color:var(--muted);font-weight:800;text-transform:uppercase;margin-bottom:5px}
@@ -92,6 +100,7 @@ select{font-family:inherit}
 .finish-badge.semifinalist{background:#e8e1f5;color:#59447e}
 .search{padding:8px;border:1px solid #cbd3db;border-radius:7px;width:100%;max-width:360px}
 tr.highlight-row td{background:rgba(220,38,38,.10);font-weight:600}
+.filter-hint{font-size:.72em;font-weight:400;opacity:.78;}
 </style>
 </head>
 <body>
@@ -115,12 +124,14 @@ tr.highlight-row td{background:rgba(220,38,38,.10);font-weight:600}
     <button class="tab" data-tab="league">Central League - Fall 2026</button>
   </div>
 
-  <div class="panel" id="globalFilterPanel">
-    <div class="section-title"><h2>Filters</h2><span class="pill" id="filterCount">0 filters</span></div>
-    <div class="filters" id="filters"></div>
-    <div class="actions"><button class="primary" id="clearFilters">Clear all filters</button></div>
-    <p class="small">Filters stay visible on every page. Choices update to show only values possible with the other selected filters.</p>
-  </div>
+  <details class="panel collapsible-panel" id="globalFilterPanel" open>
+    <summary><span class="section-title"><h2>Filters <span class="filter-hint">(click to collapse / expand)</span></h2><span class="pill" id="filterCount">0 filters</span></span></summary>
+    <div class="collapsible-content">
+      <div class="filters" id="filters"></div>
+      <div class="actions"><button class="primary" id="clearFilters">Clear all filters</button></div>
+      <p class="small">Filters stay available on every page. Choices update to show only values possible with the other selected filters.</p>
+    </div>
+  </details>
 
   <section id="overview" class="tabpage">
     <div class="cards" id="summaryCards"></div>
@@ -187,12 +198,14 @@ tr.highlight-row td{background:rgba(220,38,38,.10);font-weight:600}
   </section>
 
   <section id="tournaments" class="tabpage hidden">
-    <div class="panel">
-      <div class="section-title"><h2>Tournament Filters</h2><span class="pill" id="tournamentFilterCount">0 filters</span></div>
-      <div class="filters" id="tournamentFilters"></div>
-      <div class="actions"><button class="primary" id="clearTournamentFilters">Clear tournament filters</button></div>
-      <p class="small">These filters apply only to this Tournaments page and do not affect the other dashboard pages.</p>
-    </div>
+    <details class="panel collapsible-panel" id="tournamentFilterPanel" open>
+      <summary><span class="section-title"><h2>Tournament Filters <span class="filter-hint">(click to collapse / expand)</span></h2><span class="pill" id="tournamentFilterCount">0 filters</span></span></summary>
+      <div class="collapsible-content">
+        <div class="filters" id="tournamentFilters"></div>
+        <div class="actions"><button class="primary" id="clearTournamentFilters">Clear tournament filters</button></div>
+        <p class="small">These filters apply only to this Tournaments page and do not affect the other dashboard pages.</p>
+      </div>
+    </details>
     <div class="panel">
       <div class="section-title"><h2>Tournament Highlights</h2><span class="small">Tournament history from the workbook’s Tournaments tab</span></div>
       <div class="cards" id="tournamentCards"></div>
