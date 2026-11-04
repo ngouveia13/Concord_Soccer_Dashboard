@@ -732,7 +732,8 @@ function renderTournaments(){
 
 function renderLeague(){
  const s=document.getElementById('leagueStandings');
- s.innerHTML=LEAGUE_STANDINGS.map((t,i)=>`<tr class="${t.Team==='Concord 2015 Girls Red'?'highlight-row':''}"><td>${t.Rk}</td><td><strong style="${t.Team==='Concord 2015 Girls Red'?'color:#dc2626;font-weight:800;':''}">${esc(t.Team)}</strong></td><td>${t.P}</td><td>${t.W}</td><td>${t.D}</td><td>${t.L}</td><td>${t.GF}</td><td>${t.GA}</td><td>${t.GD>0?'+':''}${t.GD}</td><td><strong>${t.Pts}</strong></td></tr>`).join('');
+ const orderedStandings=[...LEAGUE_STANDINGS].sort((a,b)=>(b.Pts-a.Pts)||(b.GD-a.GD)||(b.GF-a.GF));
+ s.innerHTML=orderedStandings.map((t,i)=>`<tr class="${t.Team==='Concord 2015 Girls Red'?'highlight-row':''}"><td>${i+1}</td><td><strong style="${t.Team==='Concord 2015 Girls Red'?'color:#dc2626;font-weight:800;':''}">${esc(t.Team)}</strong></td><td>${t.P}</td><td>${t.W}</td><td>${t.D}</td><td>${t.L}</td><td>${t.GF}</td><td>${t.GA}</td><td>${t.GD>0?'+':''}${t.GD}</td><td><strong>${t.Pts}</strong></td></tr>`).join('');
  document.getElementById('leagueStatus').textContent=`${LEAGUE_STANDINGS.length} teams · ${LEAGUE_SCHEDULE.filter(g=>g['Home Score']!==null&&g['Away Score']!==null).length} completed matches`;
  const q=(document.getElementById('leagueSearch')?.value||'').toLowerCase();
  const rows=LEAGUE_SCHEDULE.filter(g=>(g.Home+' '+g.Away+' '+g.Date).toLowerCase().includes(q)).slice().sort((a,b)=>a.Date.localeCompare(b.Date));
