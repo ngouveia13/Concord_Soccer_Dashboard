@@ -135,6 +135,14 @@ tr.highlight-row td{background:rgba(220,38,38,.10);font-weight:600}
 .next-day-games[open]>summary:after{content:"−"}
 .next-day-game-list{padding:0 14px 14px}
 .next-game-divider{height:1px;background:var(--line);margin:16px 0}
+
+.top-assist-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:10px}
+.top-assist-tile{min-height:112px;border:1px solid var(--line,#d9dee7);border-radius:14px;padding:16px;display:flex;flex-direction:column;justify-content:space-between;background:var(--card,#fff);box-shadow:0 2px 8px rgba(20,30,50,.06)}
+.top-assist-rank{font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted,#77808d)}
+.top-assist-pair{font-size:1.05rem;font-weight:750;line-height:1.3;margin:12px 0;overflow-wrap:anywhere}
+.top-assist-pair .to{font-weight:500;color:var(--muted,#77808d);padding:0 4px}
+.top-assist-count{font-size:.82rem;font-weight:650;color:var(--muted,#77808d)}
+@media(max-width:480px){.top-assist-tiles{grid-template-columns:1fr}.top-assist-tile{min-height:90px}}
 </style>
 </head>
 <body>
@@ -207,6 +215,10 @@ tr.highlight-row td{background:rgba(220,38,38,.10);font-weight:600}
       <div class="grid2">
         <div class="panel"><h3>Goals by Player</h3><div id="playerBars"></div></div>
         <div class="panel"><h3>Assists</h3><div class="kpi-note">Assists began being tracked in October 2026. Totals reflect recorded assist events only.</div><div id="playerAssists"></div></div>
+      </div>
+      <div class="panel">
+        <div class="section-title"><h3>Assist Combinations</h3><span class="small">Most frequent recorded assist-to-goal combinations</span></div>
+        <div id="topAssistCombos"></div>
       </div>
       <div class="panel">
         <div class="section-title"><h3>Goal Events</h3><input id="goalSearch" class="search" placeholder="Search player or opponent…"></div>
@@ -549,6 +561,21 @@ function renderGoals(){
   document.getElementById("playerAssists").innerHTML=assistRows.map(([p,n])=>
     `<div class="barrow"><div>${esc(p)}</div><div class="barbg"><div class="bar green" style="width:${n/assistMax*100}%"></div></div><div>${fmt(n)}</div></div>`
   ).join("") || `<div class="empty">No recorded assists match the filters.</div>`;
+  const comboCounts = {};
+  ASSISTS.forEach(a=>{
+    if(eligible.has(`${a.Date}|${a.Opponent}`)){
+      const key=`${a.Assist}\u0000${a.Goal}`;
+      comboCounts[key]=(comboCounts[key]||0)+1;
+    }
+  });
+  const comboRows=Object.entries(comboCounts).map(([key,count])=>{
+    const [assister,scorer]=key.split("\u0000");
+    return {assister,scorer,count};
+  }).sort((a,b)=>b.count-a.count || a.assister.localeCompare(b.assister) || a.scorer.localeCompare(b.scorer)).slice(0,5);
+  document.getElementById("topAssistCombos").innerHTML=comboRows.length ?
+    `<div class="top-assist-tiles">${comboRows.map((x,i)=>
+      `<div class="top-assist-tile"><div class="top-assist-rank">#${i+1} combination</div><div class="top-assist-pair">${esc(x.assister)}<span class="to">to</span>${esc(x.scorer)}</div><div class="top-assist-count">${fmt(x.count)} ${x.count===1?"time":"times"}</div></div>`
+    ).join("")}</div>` : `<div class="empty">No recorded assist combinations match the filters.</div>`;
 
   const q=(document.getElementById("goalSearch").value||"").toLowerCase();
   const events=[];
